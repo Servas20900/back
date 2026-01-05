@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional, IsNumber, IsEnum, IsDecimal, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Status } from '@prisma/client';
 
 export class CreateProductDto {
@@ -16,6 +17,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   @Min(0)
   stock?: number;
 
@@ -25,6 +27,7 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @Type(() => Number)
   id_category!: number;
 }
 
@@ -43,6 +46,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   stock?: number;
 
   @IsOptional()
@@ -51,6 +55,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   id_category?: number;
 
   @IsOptional()
@@ -61,6 +66,7 @@ export class UpdateProductDto {
 export class ProductFilterDto {
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   id_category?: number;
 
   @IsOptional()

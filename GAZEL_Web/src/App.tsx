@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout/Layout';
+import { AdminLayout } from './components/AdminLayout/AdminLayout';
 import Home from './pages/Home/Home';
 import CategoryView from './pages/CategoryView/CategoryView';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
@@ -10,6 +11,8 @@ import Checkout from './pages/Checkout/Checkout';
 import Auth from './pages/Auth/Auth';
 import SearchResults from './pages/SearchResults/SearchResults';
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess';
+import { AdminCategories } from './pages/Admin/AdminCategories';
+import { AdminProducts } from './pages/Admin/AdminProducts';
 import './App.css';
 
 function App() {
@@ -27,6 +30,12 @@ function App() {
               <Route path="auth" element={<Auth />} />
               <Route path="search" element={<SearchResults />} />
               <Route path="order-success" element={<OrderSuccess />} />
+            </Route>
+            
+            {/* Rutas de Administración */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="categories" element={<AdminCategories />} />
+              <Route path="products" element={<AdminProducts />} />
             </Route>
           </Routes>
         </CartProvider>

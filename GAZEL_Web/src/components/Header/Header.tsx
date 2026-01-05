@@ -85,6 +85,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
             </svg>
             {isAuthenticated && <span className="user-name">{user?.full_name.split(' ')[0]}</span>}
           </Link>
+
+          {/* Admin - Solo visible para administradores */}
+          {isAuthenticated && user?.role === 'ADMIN' && (
+            <Link to="/admin/products" className="header-icon admin-icon" title="Panel de Administración">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          )}
         </div>
       </div>
     </header>

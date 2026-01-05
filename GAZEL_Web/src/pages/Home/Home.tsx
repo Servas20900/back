@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaTags, FaTruck, FaUndoAlt, FaLock, FaCreditCard } from 'react-icons/fa';
 import ProductCard from '../../components/ProductCard/ProductCard';
-import { productsService } from '../../services/api';
-import type { Product } from '../../types';
+import { productsService, categoriesService } from '../../services/api';
+import type { Product, Category } from '../../types';
 import './Home.css';
 
 const Home: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -19,7 +21,17 @@ const Home: React.FC = () => {
       }
     };
 
+    const loadCategories = async () => {
+      try {
+        const data = await categoriesService.getAll();
+        setCategories(data as Category[]);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+
     loadProducts();
+    loadCategories();
   }, []);
 
   return (
@@ -48,37 +60,18 @@ const Home: React.FC = () => {
       <section className="categories-section">
         <h2 className="section-title">Compra por Categoría</h2>
         <div className="categories-grid">
-          <Link to="/category/licras" className="category-card">
-            <div className="category-image" style={{ backgroundColor: '#1f2937' }}>
-              <span className="category-icon">👖</span>
-            </div>
-            <h3>Licras</h3>
-            <p>Alta compresión y comodidad</p>
-          </Link>
-
-          <Link to="/category/shorts" className="category-card">
-            <div className="category-image" style={{ backgroundColor: '#ef4444' }}>
-              <span className="category-icon">🩳</span>
-            </div>
-            <h3>Shorts</h3>
-            <p>Libertad de movimiento</p>
-          </Link>
-
-          <Link to="/category/parte-superior" className="category-card">
-            <div className="category-image" style={{ backgroundColor: '#8b5cf6' }}>
-              <span className="category-icon">👕</span>
-            </div>
-            <h3>Parte Superior</h3>
-            <p>Tops y camisetas deportivas</p>
-          </Link>
-
-          <Link to="/category/accesorios" className="category-card">
-            <div className="category-image" style={{ backgroundColor: '#10b981' }}>
-              <span className="category-icon">🎒</span>
-            </div>
-            <h3>Accesorios</h3>
-            <p>Complementa tu outfit</p>
-          </Link>
+          {categories.map((cat, index) => {
+            const colors = ['#ec4899', '#db2777', '#be185d', '#9f1239'];
+            return (
+              <Link key={cat.id_category} to={`/category/${cat.id_category}`} className="category-card">
+                <div className="category-image" style={{ backgroundColor: colors[index % colors.length] }}>
+                  <span className="category-icon"><FaTags size={48} /></span>
+                </div>
+                <h3>{cat.name}</h3>
+                <p>{cat.description || 'Explora nuestros productos'}</p>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -101,25 +94,25 @@ const Home: React.FC = () => {
       <section className="features-section">
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">🚚</div>
+            <div className="feature-icon"><FaTruck size={32} /></div>
             <h3>Envío Gratis</h3>
             <p>En compras superiores a $100.000</p>
           </div>
 
           <div className="feature-card">
-            <div className="feature-icon">🔄</div>
+            <div className="feature-icon"><FaUndoAlt size={32} /></div>
             <h3>Cambios Fáciles</h3>
             <p>30 días para cambios y devoluciones</p>
           </div>
 
           <div className="feature-card">
-            <div className="feature-icon">🔒</div>
+            <div className="feature-icon"><FaLock size={32} /></div>
             <h3>Pago Seguro</h3>
             <p>Protegemos tus datos personales</p>
           </div>
 
           <div className="feature-card">
-            <div className="feature-icon">💳</div>
+            <div className="feature-icon"><FaCreditCard size={32} /></div>
             <h3>Múltiples Pagos</h3>
             <p>Aceptamos todas las tarjetas</p>
           </div>

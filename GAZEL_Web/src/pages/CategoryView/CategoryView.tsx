@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { FaBoxOpen } from 'react-icons/fa';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { productsService } from '../../services/api';
 import type { Product } from '../../types';
@@ -15,20 +16,14 @@ const CategoryView: React.FC = () => {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const allProducts = await productsService.getAll() as Product[];
-        
-        // Si hay un parámetro de categoría, filtrar productos
         if (category) {
-          // Convertir la URL slugificada a nombre normal
-          // Ej: "parte-superior" -> "parte superior"
-          const categorySearchTerm = category.replace(/-/g, ' ').toLowerCase();
-          
-          const filtered = allProducts.filter(p => 
-            p.category.name.toLowerCase() === categorySearchTerm
-          );
+          // Convertir el parámetro a número
+          const categoryId = parseInt(category, 10);
+          const filtered = await productsService.getByCategory(categoryId) as Product[];
           setProducts(filtered);
           setCategoryName(filtered[0]?.category.name || 'Productos');
         } else {
+          const allProducts = await productsService.getAll() as Product[];
           setProducts(allProducts);
         }
       } catch (error) {
@@ -64,7 +59,7 @@ const CategoryView: React.FC = () => {
         </div>
       ) : (
         <div className="empty-state">
-          <div className="empty-icon">📦</div>
+          <div className="empty-icon"><FaBoxOpen size={48} /></div>
           <h2>No hay productos en esta categoría</h2>
           <p>Vuelve pronto para ver nuevos productos</p>
         </div>

@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { categoriesService } from '../../services/api';
+import type { Category } from '../../types';
 import './Aside.css';
 
 interface AsideProps {
@@ -7,15 +9,21 @@ interface AsideProps {
   onClose: () => void;
 }
 
-const categories = [
-  { name: 'Licras', path: '/category/licras' },
-  { name: 'Shorts', path: '/category/shorts' },
-  { name: 'Parte Superior', path: '/category/parte-superior' },
-  { name: 'Accesorios Deportivos', path: '/category/accesorios' },
-];
-
 const Aside: React.FC<AsideProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await categoriesService.getAll();
+        setCategories(data as Category[]);
+      } catch (error) {
+        console.error('Error al cargar categorías:', error);
+      }
+    };
+    load();
+  }, []);
 
   const handleLinkClick = () => {
     onClose();
@@ -62,9 +70,9 @@ const Aside: React.FC<AsideProps> = ({ isOpen, onClose }) => {
 
           {categories.map((category) => (
             <Link
-              key={category.path}
-              to={category.path}
-              className={`aside-link ${location.pathname === category.path ? 'active' : ''}`}
+              key={category.id_category}
+              to={`/category/${category.id_category}`}
+              className={`aside-link ${location.pathname === `/category/${category.id_category}` ? 'active' : ''}`}
               onClick={handleLinkClick}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">

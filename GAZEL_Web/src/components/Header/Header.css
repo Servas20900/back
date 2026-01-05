@@ -130,6 +130,15 @@
   font-weight: 500;
 }
 
+.admin-icon {
+  color: #764ba2 !important;
+}
+
+.admin-icon:hover {
+  color: #667eea !important;
+  transform: scale(1.1);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .header-container {

@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: gazel_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: gazel_password
       TZ: America/Costa_Rica
@@ -15,19 +15,13 @@ services:
       - "5432:5432"
 
     volumes:
-      # Persistencia de datos
       - postgres_data:/var/lib/postgresql/data
-
-      # Scripts de inicialización - se ejecutan en orden alfabético
-      - ./init/00-createDB.sql:/docker-entrypoint-initdb.d/00-createDB.sql
-      - ./init/initDB.sql:/docker-entrypoint-initdb.d/01-initDB.sql
-      - ./init/02-seedData.sql:/docker-entrypoint-initdb.d/02-seedData.sql
 
     networks:
       - gazel_network
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gazel_db"]
       interval: 10s
       timeout: 5s
       retries: 5

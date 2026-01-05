@@ -22,7 +22,7 @@ const Cart: React.FC = () => {
   if (items.length === 0) {
     return (
       <div className="cart-empty">
-        <div className="empty-cart-icon">🛒</div>
+        <div className="empty-cart-icon"><FaShoppingCart size={48} /></div>
         <h2>Tu carrito está vacío</h2>
         <p>Agrega productos para comenzar tu compra</p>
         <Link to="/" className="btn btn-primary">

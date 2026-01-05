@@ -8,10 +8,15 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...options.headers as Record<string, string>,
-  };
+  const headers: Record<string, string> = {};
+
+  // No agregar Content-Type si se envía FormData (el browser lo hace automáticamente)
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  // Agregar headers adicionales
+  Object.assign(headers, options.headers || {});
 
   // Agregar token si existe
   const token = localStorage.getItem('access_token');
@@ -59,10 +64,27 @@ export const productsService = {
   getById: (id: number) => apiRequest(`/products/${id}`),
 
   getByCategory: (categoryId: number) =>
-    apiRequest(`/products?category=${categoryId}`),
+    apiRequest(`/products?id_category=${categoryId}`),
 
   search: (query: string) =>
     apiRequest(`/products/search?q=${encodeURIComponent(query)}`),
+
+  create: (formData: FormData) =>
+    apiRequest('/products', {
+      method: 'POST',
+      body: formData,
+    }),
+
+  update: (id: number, formData: FormData) =>
+    apiRequest(`/products/${id}`, {
+      method: 'PUT',
+      body: formData,
+    }),
+
+  delete: (id: number) =>
+    apiRequest(`/products/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 // CATEGORIES SERVICE
@@ -70,6 +92,23 @@ export const categoriesService = {
   getAll: () => apiRequest('/categories'),
 
   getById: (id: number) => apiRequest(`/categories/${id}`),
+
+  create: (data: { name: string; description?: string }) =>
+    apiRequest('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  update: (id: number, data: { name?: string; description?: string; status?: string }) =>
+    apiRequest(`/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: number) =>
+    apiRequest(`/categories/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 // CART SERVICE
@@ -147,4 +186,14 @@ export const paymentsService = {
       method: 'PATCH',
       body: JSON.stringify({ payment_status: status }),
     }),
+};
+
+// Exportar todo bajo el namespace api para facilitar el uso
+export const api = {
+  auth: authService,
+  products: productsService,
+  categories: categoriesService,
+  cart: cartService,
+  orders: ordersService,
+  payments: paymentsService,
 };
