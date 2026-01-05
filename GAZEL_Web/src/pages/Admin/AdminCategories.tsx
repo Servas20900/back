@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaCamera } from 'react-icons/fa';
 import { api } from '../../services/api';
 import './AdminCategories.css';
 
@@ -7,6 +7,7 @@ interface Category {
   id_category: number;
   name: string;
   description: string | null;
+  image_url: string | null;
   status: 'ACTIVE' | 'INACTIVE';
 }
 
@@ -15,6 +16,8 @@ export function AdminCategories() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -37,13 +40,47 @@ export function AdminCategories() {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor selecciona una imagen válida');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La imagen no debe superar los 5MB');
+        return;
+      }
+
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description);
+      
       if (editingId) {
-        await api.categories.update(editingId, formData);
+        formDataToSend.append('status', formData.status);
+      }
+
+      if (imageFile) {
+        formDataToSend.append('image', imageFile);
+      }
+
+      if (editingId) {
+        await api.categories.update(editingId, formDataToSend);
       } else {
-        await api.categories.create(formData);
+        await api.categories.create(formDataToSend);
       }
       await loadCategories();
       resetForm();
@@ -60,6 +97,7 @@ export function AdminCategories() {
       status: category.status,
     });
     setEditingId(category.id_category);
+    setImagePreview(category.image_url);
     setShowForm(true);
   };
 
@@ -79,6 +117,8 @@ export function AdminCategories() {
     setFormData({ name: '', description: '', status: 'ACTIVE' });
     setEditingId(null);
     setShowForm(false);
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   if (loading) {
@@ -121,6 +161,28 @@ export function AdminCategories() {
               />
             </div>
 
+            <div className="form-group">
+              <label htmlFor="image">Imagen</label>
+              <div className="image-upload-container">
+                {imagePreview && (
+                  <div className="image-preview">
+                    <img src={imagePreview} alt="Preview" />
+                  </div>
+                )}
+                <label htmlFor="image-input" className="image-upload-label">
+                  <FaCamera size={24} />
+                  <span>{imagePreview ? 'Cambiar imagen' : 'Subir imagen'}</span>
+                </label>
+                <input
+                  id="image-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: 'none' }}
+                />
+              </div>
+            </div>
+
             {editingId && (
               <div className="form-group">
                 <label htmlFor="status">Estado</label>
@@ -152,6 +214,7 @@ export function AdminCategories() {
           <thead>
             <tr>
               <th>ID</th>
+              <th>Imagen</th>
               <th>Nombre</th>
               <th>Descripción</th>
               <th>Estado</th>
@@ -162,6 +225,13 @@ export function AdminCategories() {
             {categories.map((category) => (
               <tr key={category.id_category}>
                 <td>{category.id_category}</td>
+                <td>
+                  {category.image_url ? (
+                    <img src={category.image_url} alt={category.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                  ) : (
+                    <div style={{ width: '50px', height: '50px', background: '#eee', borderRadius: '4px' }} />
+                  )}
+                </td>
                 <td><strong>{category.name}</strong></td>
                 <td>{category.description || '-'}</td>
                 <td>

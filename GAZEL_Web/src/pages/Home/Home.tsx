@@ -65,7 +65,11 @@ const Home: React.FC = () => {
             return (
               <Link key={cat.id_category} to={`/category/${cat.id_category}`} className="category-card">
                 <div className="category-image" style={{ backgroundColor: colors[index % colors.length] }}>
-                  <span className="category-icon"><FaTags size={48} /></span>
+                  {cat.image_url ? (
+                    <img src={cat.image_url} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span className="category-icon"><FaTags size={48} /></span>
+                  )}
                 </div>
                 <h3>{cat.name}</h3>
                 <p>{cat.description || 'Explora nuestros productos'}</p>

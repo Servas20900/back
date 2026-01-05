@@ -41,6 +41,10 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
+  avatar?: string;
+
+  @IsOptional()
+  @IsString()
   @MinLength(6)
   password?: string;
 

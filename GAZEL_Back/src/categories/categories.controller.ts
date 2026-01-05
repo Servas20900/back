@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Put, 
+  Delete, 
+  Param, 
+  Body, 
+  UseGuards, 
+  ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -20,17 +33,23 @@ export class CategoriesController {
 
   @Post()
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.categoriesService.create(createCategoryDto, file);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.categoriesService.update(id, updateCategoryDto);
+    return this.categoriesService.update(id, updateCategoryDto, file);
   }
 
   @Delete(':id')

@@ -181,6 +181,30 @@ export class OrdersService {
     });
   }
 
+  async getAllOrders() {
+    return this.prisma.order.findMany({
+      include: {
+        user: {
+          select: {
+            full_name: true,
+            email: true,
+            phone: true,
+          },
+        },
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        shipping: true,
+        payments: true,
+      },
+      orderBy: {
+        order_date: 'desc',
+      },
+    });
+  }
+
   async updateOrderStatus(id_order: number, updateOrderStatusDto: UpdateOrderStatusDto) {
     const order = await this.prisma.order.findUnique({
       where: { id_order },

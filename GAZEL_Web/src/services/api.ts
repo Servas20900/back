@@ -52,6 +52,18 @@ export const authService = {
     }),
 
   getProfile: () => apiRequest('/auth/profile'),
+
+  updateProfile: (data: { full_name?: string; phone?: string; avatar?: string }) =>
+    apiRequest('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    apiRequest('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 };
 
 // PRODUCTS SERVICE
@@ -93,16 +105,16 @@ export const categoriesService = {
 
   getById: (id: number) => apiRequest(`/categories/${id}`),
 
-  create: (data: { name: string; description?: string }) =>
+  create: (data: FormData | { name: string; description?: string }) =>
     apiRequest('/categories', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
     }),
 
-  update: (id: number, data: { name?: string; description?: string; status?: string }) =>
+  update: (id: number, data: FormData | { name?: string; description?: string; status?: string }) =>
     apiRequest(`/categories/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
     }),
 
   delete: (id: number) =>
@@ -162,6 +174,8 @@ export const ordersService = {
   getById: (id: number) => apiRequest(`/orders/${id}`),
 
   getUserOrders: () => apiRequest('/orders/user'),
+
+  getAllOrders: () => apiRequest('/orders/admin/all'),
 
   updateStatus: (id: number, status: string) =>
     apiRequest(`/orders/${id}/status`, {

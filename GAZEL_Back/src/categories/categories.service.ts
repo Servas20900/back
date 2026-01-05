@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos';
 
 @Injectable()
 export class CategoriesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cloudinary: CloudinaryService,
+  ) {}
 
   async findAll() {
     return this.prisma.category.findMany({
@@ -26,18 +30,38 @@ export class CategoriesService {
     return category;
   }
 
-  async create(createCategoryDto: CreateCategoryDto) {
+  async create(createCategoryDto: CreateCategoryDto, file?: Express.Multer.File) {
+    let image_url = createCategoryDto.image_url;
+
+    if (file) {
+      const uploadResult = await this.cloudinary.uploadImage(file);
+      image_url = uploadResult.url;
+    }
+
     return this.prisma.category.create({
-      data: createCategoryDto,
+      data: {
+        ...createCategoryDto,
+        image_url,
+      },
     });
   }
 
-  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+  async update(id: number, updateCategoryDto: UpdateCategoryDto, file?: Express.Multer.File) {
     await this.findById(id);
+
+    let image_url = updateCategoryDto.image_url;
+
+    if (file) {
+      const uploadResult = await this.cloudinary.uploadImage(file);
+      image_url = uploadResult.url;
+    }
 
     return this.prisma.category.update({
       where: { id_category: id },
-      data: updateCategoryDto,
+      data: {
+        ...updateCategoryDto,
+        image_url,
+      },
     });
   }
 

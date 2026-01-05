@@ -62,6 +62,7 @@ model User {
   email String @unique
   password_hash String
   phone String?
+  avatar String?
   role Role @default(USER)
   status Status @default(ACTIVE)
   created_at DateTime @default(now())
@@ -78,6 +79,7 @@ model Category {
   id_category Int @id @default(autoincrement())
   name String @unique
   description String?
+  image_url String?
   status Status @default(ACTIVE)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

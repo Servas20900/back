@@ -235,11 +235,45 @@
 
   .order-summary {
     position: static;
+    max-width: 500px;
+    margin: 0 auto;
   }
 }
 
 @media (max-width: 768px) {
+  .checkout-page {
+    padding: 1rem;
+  }
+
+  .checkout-title {
+    font-size: 1.5rem;
+  }
+
   .checkout-form {
     padding: 1.5rem;
+  }
+
+  .form-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-title {
+    font-size: 1.25rem;
+  }
+
+  .checkout-form {
+    padding: 1rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 0.875rem;
+    padding: 0.625rem 0.875rem;
   }
 }

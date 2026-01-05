@@ -23,8 +23,8 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
-  console.log(`🚀 GAZEL Backend API running on http://localhost:${port}`);
-  console.log(`📚 API Documentation will be available at http://localhost:${port}/api`);
+  console.log(`GAZEL Backend API running on http://localhost:${port}`);
+  console.log(`API Documentation will be available at http://localhost:${port}/api`);
 }
 
 bootstrap();

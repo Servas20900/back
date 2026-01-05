@@ -56,7 +56,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   // Calcular número total de items
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -78,8 +78,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al cargar el carrito';
-      setError(errorMessage);
-      console.error('Error loading cart:', err);
+      
+      // Si es un error de autenticación, limpiar sesión y usar carrito local
+      if (errorMessage.includes('Usuario no encontrado') || errorMessage.includes('401')) {
+        console.warn('Sesión inválida, limpiando token y usando carrito local');
+        logout();
+        const localItems = loadLocalCart();
+        setItems(localItems);
+      } else {
+        setError(errorMessage);
+        console.error('Error loading cart:', err);
+      }
     } finally {
       setIsLoading(false);
     }

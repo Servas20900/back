@@ -38,6 +38,12 @@ export class OrdersController {
     return this.ordersService.getUserOrders(id_user);
   }
 
+  @Get('admin/all')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async getAllOrders() {
+    return this.ordersService.getAllOrders();
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async getOrderById(
