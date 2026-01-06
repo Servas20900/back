@@ -94,6 +94,7 @@ export interface User {
   full_name: string;
   email: string;
   phone?: string;
+  avatar?: string;
   role: Role;
   created_at: string;
   updated_at: string;
@@ -103,6 +104,7 @@ export interface AuthResponse {
   id_user: number;
   email: string;
   full_name: string;
+  avatar?: string;
   role: Role;
   access_token: string;
 }

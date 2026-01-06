@@ -10,7 +10,6 @@ export async function apiRequest<T>(
   
   const headers: Record<string, string> = {};
 
-  // No agregar Content-Type si se envía FormData (el browser lo hace automáticamente)
   if (!(options.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
@@ -128,24 +127,24 @@ export const cartService = {
   getCart: () => apiRequest('/cart'),
 
   addItem: (data: { id_product: number; quantity: number }) =>
-    apiRequest('/cart/add', {
+    apiRequest('/cart/items', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   updateItem: (cartItemId: number, data: { quantity?: number }) =>
-    apiRequest(`/cart/item/${cartItemId}`, {
+    apiRequest(`/cart/items/${cartItemId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   removeItem: (cartItemId: number) =>
-    apiRequest(`/cart/item/${cartItemId}`, {
+    apiRequest(`/cart/items/${cartItemId}`, {
       method: 'DELETE',
     }),
 
-  clear: () =>
-    apiRequest('/cart/clear', {
+  clear: (cartId: number) =>
+    apiRequest(`/cart/${cartId}/clear`, {
       method: 'DELETE',
     }),
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaCreditCard, FaMobileAlt } from 'react-icons/fa';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { ordersService } from '../../services/api';
@@ -17,6 +18,7 @@ const Checkout: React.FC = () => {
     address: '',
   });
 
+  const [paymentMethod, setPaymentMethod] = useState<'SINPE' | 'CARD'>('SINPE');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,13 +62,13 @@ const Checkout: React.FC = () => {
 
     if (!formData.email.trim()) {
       newErrors.email = 'El email es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.exec(formData.email)) {
       newErrors.email = 'Email inválido';
     }
 
     if (!formData.phone.trim()) {
       newErrors.phone = 'El teléfono es requerido';
-    } else if (!/^\d{10}$/.test(formData.phone.replace(/\s/g, ''))) {
+    } else if (!/^\d{10}$/.exec(formData.phone.replace(/\s/g, ''))) {
       newErrors.phone = 'Teléfono debe tener 10 dígitos';
     }
 
@@ -91,6 +93,13 @@ const Checkout: React.FC = () => {
       // Calcular envío y total
       const shippingCost = total >= 100000 ? 0 : 10000;
       const finalTotal = total + shippingCost;
+
+      // Mapear método de pago al formato del backend
+      const paymentMethodMap = {
+        'SINPE': 'BANK_TRANSFER',
+        'CARD': 'CREDIT_CARD',
+        'PAYPAL': 'PAYPAL'
+      };
 
       if (isAuthenticated) {
         // Usuario autenticado: crear orden normal (requiere carrito en backend)
@@ -124,13 +133,14 @@ const Checkout: React.FC = () => {
             unit_price: Number(item.unit_price),
           })),
           total_amount: finalTotal,
+          payment_method: paymentMethodMap[paymentMethod],
         };
 
         const createdOrder = await ordersService.createGuest(guestOrderData);
 
         // Crear objeto de orden para la página de éxito
         const order = {
-          id: createdOrder.id_order || Date.now().toString(),
+          id: (createdOrder as any).id_order || Date.now().toString(),
           items,
           total: finalTotal,
           shippingInfo: formData,
@@ -212,6 +222,54 @@ const Checkout: React.FC = () => {
               className={errors.address ? 'error' : ''}
             />
             {errors.address && <span className="error-message">{errors.address}</span>}
+          </div>
+
+          {/* Payment Method Section */}
+          <div className="payment-section">
+            <h2 className="form-title">Método de Pago</h2>
+            
+            <div className="payment-methods">
+              <div 
+                className={`payment-method ${paymentMethod === 'SINPE' ? 'selected' : ''}`}
+                onClick={() => setPaymentMethod('SINPE')}
+              >
+                <FaMobileAlt size={24} />
+                <div>
+                  <h3>SINPE Móvil</h3>
+                  <p>Transferencia bancaria inmediata</p>
+                </div>
+              </div>
+
+              <div 
+                className={`payment-method ${paymentMethod === 'CARD' ? 'selected' : ''}`}
+                onClick={() => setPaymentMethod('CARD')}
+              >
+                <FaCreditCard size={24} />
+                <div>
+                  <h3>Tarjeta de Crédito/Débito</h3>
+                  <p>Pago seguro con tarjeta</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Details */}
+            {paymentMethod === 'SINPE' && (
+              <div className="payment-details">
+                <p className="payment-info">
+                  <strong>Número de teléfono SINPE:</strong> 8888-8888<br />
+                  <strong>Beneficiario:</strong> GAZEL Store<br />
+                  <small>Completa el pago y envía el comprobante al correo: pagos@gazel.com</small>
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'CARD' && (
+              <div className="payment-details">
+                <p className="payment-info">
+                  El pago con tarjeta se procesará al confirmar tu compra.
+                </p>
+              </div>
+            )}
           </div>
 
           {!isAuthenticated && (

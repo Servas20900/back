@@ -31,6 +31,8 @@ const ProductDetail: React.FC = () => {
     loadProduct();
   }, [id]);
 
+  const stockAvailable = Math.max(0, Number(product?.stock ?? 0));
+
   if (loading) {
     return (
       <div className="product-detail">
@@ -83,7 +85,7 @@ const ProductDetail: React.FC = () => {
 
   const handleQuantityChange = (delta: number) => {
     const newQuantity = quantity + delta;
-    if (newQuantity >= 1 && newQuantity <= product.stock) {
+    if (newQuantity >= 1 && newQuantity <= stockAvailable) {
       setQuantity(newQuantity);
     }
   };
@@ -105,8 +107,8 @@ const ProductDetail: React.FC = () => {
         <p className="product-price-detail">{formatPrice(product.price)}</p>
 
         <div className="product-stock">
-          {product.stock > 0 ? (
-            <span className="in-stock">✓ En stock ({product.stock} disponibles)</span>
+          {stockAvailable > 0 ? (
+            <span className="in-stock">✓ En stock ({stockAvailable} disponibles)</span>
           ) : (
             <span className="out-of-stock">✗ Agotado</span>
           )}
@@ -117,7 +119,7 @@ const ProductDetail: React.FC = () => {
           <p>{product.description}</p>
         </div>
 
-        {product.stock > 0 && (
+        {stockAvailable > 0 && (
           <>
             <div className="quantity-selector">
               <label>Cantidad:</label>
@@ -132,7 +134,7 @@ const ProductDetail: React.FC = () => {
                 <span className="quantity-display">{quantity}</span>
                 <button
                   onClick={() => handleQuantityChange(1)}
-                  disabled={quantity >= product.stock}
+                  disabled={quantity >= stockAvailable}
                   className="quantity-btn"
                 >
                   +
@@ -141,10 +143,10 @@ const ProductDetail: React.FC = () => {
             </div>
 
             <div className="product-actions">
-              <button onClick={handleAddToCart} className="btn btn-add-to-cart">
+              <button type="button" onClick={handleAddToCart} className="btn btn-add-to-cart">
                 Agregar al Carrito
               </button>
-              <button onClick={handleBuyNow} className="btn btn-buy-now">
+              <button type="button" onClick={handleBuyNow} className="btn btn-buy-now">
                 Comprar Ahora
               </button>
             </div>

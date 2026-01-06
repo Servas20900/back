@@ -3,27 +3,13 @@ import { Navigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaKey, FaSave, FaEdit } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
+import type { User } from '../../types';
 import './Profile.css';
-
-// Avatares disponibles (usando DiceBear API)
-const AVATAR_STYLES = [
-  'adventurer',
-  'adventurer-neutral',
-  'avataaars',
-  'big-ears',
-  'big-smile',
-  'bottts',
-  'croodles',
-  'fun-emoji',
-  'micah',
-  'personas',
-];
 
 const Profile: React.FC = () => {
   const { user, logout, updateProfile } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState(0);
   const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -46,19 +32,12 @@ const Profile: React.FC = () => {
         full_name: user.full_name,
         phone: user.phone || '',
       });
-      // Usar el email del usuario para generar un avatar consistente
-      const avatarIndex = user.email.charCodeAt(0) % AVATAR_STYLES.length;
-      setSelectedAvatar(avatarIndex);
     }
   }, [user]);
 
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-
-  const getAvatarUrl = (index: number) => {
-    return `https://api.dicebear.com/7.x/${AVATAR_STYLES[index]}/svg?seed=${user.email}`;
-  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +46,7 @@ const Profile: React.FC = () => {
     setSuccess('');
 
     try {
-      const updated = await api.auth.updateProfile(formData);
+      const updated = (await api.auth.updateProfile(formData)) as User;
       updateProfile(updated);
       setSuccess('Perfil actualizado correctamente');
       setEditMode(false);
@@ -121,27 +100,6 @@ const Profile: React.FC = () => {
 
         {error && <div className="alert alert-error">{error}</div>}
         {success && <div className="alert alert-success">{success}</div>}
-
-        {/* Avatar Section */}
-        <div className="profile-card">
-          <h2 className="card-title">Avatar</h2>
-          <div className="avatar-section">
-            <div className="avatar-display">
-              <img src={getAvatarUrl(selectedAvatar)} alt="Avatar" />
-            </div>
-            <div className="avatar-grid">
-              {AVATAR_STYLES.map((style, index) => (
-                <div
-                  key={style}
-                  className={`avatar-option ${selectedAvatar === index ? 'selected' : ''}`}
-                  onClick={() => setSelectedAvatar(index)}
-                >
-                  <img src={getAvatarUrl(index)} alt={style} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* Profile Info */}
         <div className="profile-card">

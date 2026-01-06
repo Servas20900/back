@@ -61,62 +61,6 @@
   transform: translateY(-2px);
 }
 
-/* Avatar Section */
-.avatar-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-}
-
-.avatar-display {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 4px solid #E83E8C;
-  box-shadow: 0 4px 12px rgba(232, 62, 140, 0.3);
-}
-
-.avatar-display img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.avatar-option {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid #e5e7eb;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.avatar-option:hover {
-  transform: scale(1.1);
-  border-color: #E83E8C;
-}
-
-.avatar-option.selected {
-  border-color: #E83E8C;
-  box-shadow: 0 0 0 3px rgba(232, 62, 140, 0.2);
-}
-
-.avatar-option img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 /* Profile Info */
 .profile-info {
   display: flex;

@@ -22,6 +22,15 @@ interface Category {
   name: string;
 }
 
+interface ProductFormState {
+  name: string;
+  description: string;
+  price: string;
+  stock: string;
+  id_category: number;
+  status: 'ACTIVE' | 'INACTIVE';
+}
+
 export function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -30,13 +39,13 @@ export function AdminProducts() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductFormState>({
     name: '',
     description: '',
     price: '',
-    stock: 0,
+    stock: '',
     id_category: 0,
-    status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE',
+    status: 'ACTIVE',
   });
 
   useEffect(() => {
@@ -93,10 +102,16 @@ export function AdminProducts() {
 
     try {
       const formDataToSend = new FormData();
+      const stockNumber = Number(formData.stock);
+      if (Number.isNaN(stockNumber) || stockNumber < 0) {
+        alert('Ingresa un stock válido (0 o mayor)');
+        return;
+      }
+
       formDataToSend.append('name', formData.name);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('price', formData.price);
-      formDataToSend.append('stock', formData.stock.toString());
+      formDataToSend.append('stock', stockNumber.toString());
       formDataToSend.append('id_category', formData.id_category.toString());
       
       if (editingId) {
@@ -126,7 +141,7 @@ export function AdminProducts() {
       name: product.name,
       description: product.description || '',
       price: product.price.toString(),
-      stock: product.stock,
+      stock: product.stock.toString(),
       id_category: product.id_category,
       status: product.status,
     });
@@ -152,7 +167,7 @@ export function AdminProducts() {
       name: '',
       description: '',
       price: '',
-      stock: 0,
+      stock: '',
       id_category: 0,
       status: 'ACTIVE',
     });
@@ -216,12 +231,12 @@ export function AdminProducts() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="stock">Stock *</label>
+                <label htmlFor="stock">Stock *</label>
               <input
                 id="stock"
                 type="number"
                 value={formData.stock}
-                onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                 required
                 placeholder="25"
               />

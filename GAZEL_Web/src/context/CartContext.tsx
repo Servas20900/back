@@ -56,6 +56,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cartId, setCartId] = useState<number | null>(null);
   const { isAuthenticated, logout } = useAuth();
 
   // Calcular número total de items
@@ -72,9 +73,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       if (isAuthenticated) {
         const cart = await cartService.getCart() as Cart;
         setItems(cart.items || []);
+        setCartId(cart.id_cart);
       } else {
         const localItems = loadLocalCart();
         setItems(localItems);
+        setCartId(null);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al cargar el carrito';
@@ -85,6 +88,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         logout();
         const localItems = loadLocalCart();
         setItems(localItems);
+        setCartId(null);
       } else {
         setError(errorMessage);
         console.error('Error loading cart:', err);
@@ -195,12 +199,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     try {
       if (isAuthenticated) {
         // Usuario autenticado: usar API del servidor
-        await cartService.clear();
+        const currentCartId = cartId ?? (await cartService.getCart()).id_cart;
+        await cartService.clear(currentCartId);
         setItems([]);
+        setCartId(currentCartId);
       } else {
         // Usuario no autenticado: limpiar localStorage
         saveLocalCart([]);
         setItems([]);
+        setCartId(null);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al vaciar el carrito';
